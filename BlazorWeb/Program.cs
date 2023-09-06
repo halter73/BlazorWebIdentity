@@ -1,3 +1,4 @@
+using System.Reflection;
 using BlazorWeb.Components;
 using BlazorWeb.Identity.Data;
 using Microsoft.AspNetCore.Identity;
@@ -9,17 +10,19 @@ sqlConnection.Open();
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
 builder.Services.AddDbContext<BlazorIdentityContext>(options => options.UseSqlite(sqlConnection));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddAuthentication()
     .AddIdentityCookies();
 
+builder.Services.AddCascadingAuthenticationState();
+
 builder.Services.AddIdentityCore<BlazorIdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddApiEndpoints()
     .AddEntityFrameworkStores<BlazorIdentityContext>();
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
     .AddServerComponents()
     .AddWebAssemblyComponents();
@@ -44,7 +47,8 @@ app.UseStaticFiles();
 
 app.MapRazorComponents<App>()
     .AddServerRenderMode()
-    .AddWebAssemblyRenderMode();
+    .AddWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(Assembly.Load("BlazorWeb.Client"));
 
 using (var scope = app.Services.CreateScope())
 {
