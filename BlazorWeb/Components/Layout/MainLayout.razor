@@ -8,6 +8,34 @@
     <main>
         <div class="top-row px-4">
             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+
+            <AuthorizeView>
+                <Authorized>
+                    Authorized
+@*                     @{
+                        var c = context;
+                    }
+                    <li class="nav-item">
+                        <a id="manage" class="nav-link text-dark" href="Identity/Account/Manage/Index" title="Manage">Hello @context.User.Identity?.Name!</a>
+                    </li>
+                    <li class="nav-item">
+                        <form id="logoutForm" class="form-inline" method="post" @onsubmit="Logout" @formname="logout">
+                            <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">Logout</button>
+                            <AntiforgeryToken />
+                        </form>
+                    </li> *@
+                </Authorized>
+                <NotAuthorized>
+                    <NavLink href="/Identity/Account/Register">Register</NavLink>
+                    <NavLink href="/Identity/Account/Login">Login</NavLink>
+@*                     <li class="nav-item">
+                        <a class="nav-link text-dark" id="register" href="Identity/Account/Register">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" id="login" href="Identity/Account/Login">Login</a>
+                    </li> *@
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
 
         <article class="content px-4">

@@ -8,6 +8,16 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
+<AuthorizeView>
+    <Authorized>
+        Authorized
+    </Authorized>
+    <NotAuthorized>
+        <NavLink href="/Identity/Account/Register">Register</NavLink>
+        <NavLink href="/Identity/Account/Login">Login</NavLink>
+    </NotAuthorized>
+</AuthorizeView>
+
 @code {
     private int currentCount = 0;
 
