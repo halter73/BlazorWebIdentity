@@ -9,13 +9,24 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
+<hr />
+
+<EditForm Model="Input" OnSubmit="HandleSubmit">
+    <InputText id="test" @bind-Value="Input.Text" />
+    <button type="submit">Submit</button>
+</EditForm>
+
+<p>Input.Text: @Input.Text</p>
+<p>submittedText: @submittedText</p>
+
+<hr />
+
 <AuthorizeView>
     <Authorized>
-        Authorized
+        <p>Authorized as @context.User.Identity?.Name</p>
     </Authorized>
     <NotAuthorized>
-        <NavLink href="/Identity/Account/Register">Register</NavLink>
-        <NavLink href="/Identity/Account/Login">Login</NavLink>
+        <p>Unauthorized</p>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -25,5 +36,22 @@
     private void IncrementCount()
     {
         currentCount++;
+    }
+}
+
+@code {
+    [SupplyParameterFromForm]
+    public InputModel Input { get; set; } = new();
+
+    public class InputModel
+    {
+        public string? Text { get; set; }
+    }
+
+    private string? submittedText = "";
+
+    private void HandleSubmit()
+    {
+        submittedText = Input.Text;
     }
 }

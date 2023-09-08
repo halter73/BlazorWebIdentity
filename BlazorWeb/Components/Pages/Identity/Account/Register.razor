@@ -9,9 +9,9 @@
 @using Microsoft.AspNetCore.Identity.UI.Services
 @using Microsoft.AspNetCore.WebUtilities
 
-@inject UserManager<BlazorIdentityUser> UserManager
-@inject IUserStore<BlazorIdentityUser> UserStore
-@inject SignInManager<BlazorIdentityUser> SignInManager
+@inject UserManager<BlazorWebUser> UserManager
+@inject IUserStore<BlazorWebUser> UserStore
+@inject SignInManager<BlazorWebUser> SignInManager
 @inject ILogger<Register> Logger
 @inject IEmailSender EmailSender
 @inject NavigationManager NavigationManager
@@ -179,25 +179,25 @@
         }
     }
 
-    private BlazorIdentityUser CreateUser()
+    private BlazorWebUser CreateUser()
     {
         try
         {
-            return Activator.CreateInstance<BlazorIdentityUser>();
+            return Activator.CreateInstance<BlazorWebUser>();
         }
         catch
         {
-            throw new InvalidOperationException($"Can't create an instance of '{nameof(BlazorIdentityUser)}'. " +
-                $"Ensure that '{nameof(BlazorIdentityUser)}' is not an abstract class and has a parameterless constructor.");
+            throw new InvalidOperationException($"Can't create an instance of '{nameof(BlazorWebUser)}'. " +
+                $"Ensure that '{nameof(BlazorWebUser)}' is not an abstract class and has a parameterless constructor.");
         }
     }
 
-    private IUserEmailStore<BlazorIdentityUser> GetEmailStore()
+    private IUserEmailStore<BlazorWebUser> GetEmailStore()
     {
         if (!UserManager.SupportsUserEmail)
         {
             throw new NotSupportedException("The default UI requires a user store with email support.");
         }
-        return (IUserEmailStore<BlazorIdentityUser>) UserStore;
+        return (IUserEmailStore<BlazorWebUser>) UserStore;
     }
 }

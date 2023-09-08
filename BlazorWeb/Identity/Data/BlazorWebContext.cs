@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlazorWeb.Identity.Data;
 
-public class BlazorIdentityContext : IdentityDbContext<BlazorIdentityUser>
+public class BlazorWebContext : IdentityDbContext<BlazorWebUser>
 {
-    public BlazorIdentityContext(DbContextOptions<BlazorIdentityContext> options)
+    public BlazorWebContext(DbContextOptions<BlazorWebContext> options)
         : base(options)
     {
     }
