@@ -1,0 +1,104 @@
+@hostname=localhost
+@port=5042
+@token=token
+
+### Anonymous endpoint
+GET http://{{hostname}}:{{port}}
+
+### Register
+POST http://{{hostname}}:{{port}}/identity/register
+Content-Type: application/json
+
+{
+  "Email": "example@example.com",
+  "Password": "[PLACEHOLDER]-1a"
+}
+
+### Login (Bearer token)
+POST http://{{hostname}}:{{port}}/identity/login
+Content-Type: application/json
+
+{
+  "Email": "example@example.com",
+  "Password": "[PLACEHOLDER]-1a"
+}
+
+### Authenticated endpoint
+GET http://{{hostname}}:{{port}}/requires-auth
+
+### Authenticated endpoint (Bearer token)
+GET http://{{hostname}}:{{port}}/requires-auth
+Authorization: Bearer {{token}}
+
+### Info
+GET http://{{hostname}}:{{port}}/identity/manage/info
+Authorization: Bearer {{token}}
+
+### Refresh
+POST http://{{hostname}}:{{port}}/identity/refresh
+Content-Type: application/json
+
+{
+  "RefreshToken": "CfDJ8DfkOhXR6QxOpJYkbuWe4ug2uWbf5eVEnZf92xMu2KU-WVCwDxuaSX-vUzcAXobY3f72P87fY63Pejp3XyjDMYJHw62a9_G2b5VyY5EnYkE6491VOy0uIyn_0J3SU45wSTha6IXpkFbIxcEW_mGVhFznYXb9F7ajgJUBxUOsFpikyGw1jt3LhJpv0Tf-WGJOZdQUiBvvGqGiBwgtwYs4Nd8Y4_5Pl9luZB7LxMGAFhuWCe601rFLZ6do4BjfcQm6hlQYWLBcpvOv4yFURm5MfUM7_Lyji_4oB774PT-SS3Q_6F8e2j--qX1rTBf_d8ilmLoVSvmaUtjOCOf3_zP9rViHBg8TxNWEGqJD4FZqUGZMJGUmm08xlA_RaJkpGzjtKK3eVu16fKIeyyVcuNhwrk2iyFFy07bOeCCLtWj8HsUSjuNFAOLUKzT92XMFStiMo2piYl4Du2TNjKF1TglEjIsleLVDEih0McgqOgbV038vCEs6dqg2EDSiyzZiFzeQS-PSsThxaDuEjf1Bwl0l3TGvS7O0eMAcMTG0HM7mkbDpYM10jLIFBUjGoMyOsOWkBS_TsX_F6cLd1_qT7z9RLEQxB8gkwQGv7SYDdO5H4QuyulRpgfg8CBN6ziR_pLc4VOz-0F8-46t-r8rHx1PHbsyCX9vVWCl07CgRPiYxeV6g_Pk5kPY_6AnjxK79WJCkiQA1nz7H7KlK0o4xxjfw3Jo"
+}
+
+### Resend confirmation email
+POST http://{{hostname}}:{{port}}/identity/resendConfirmationEmail
+Content-Type: application/json
+
+{
+  "Email": "example@example.com"
+}
+
+### Confirm email
+GET http://{{hostname}}:{{port}}/identity/confirmEmail?userId=a1c55757-5dab-4c95-b5cd-6010442c9cf0&code=Q2ZESjhEZmtPaFhSNlF4T3BKWWtidVdlNHVoZGJaTWNyOGhJVkVLQkFtUHZrMXdVMjBqdk9kcnZ3Y1lMS2t0MHVhZlhYcEVmeUV0K2tETkdNQVRQaXF1WThsYUpGbWdWSlQ0YWJucjF2aUVMaHNmaGVyTERVd0NPYU9KdHdFeUVFWkk0RFhyWDhLNW5FbWU1aURFUjJIVHpoRjUrYlRuK2pDdlFyd09MNXFaT1Y1UlhUeElscFpJTW05dzBYaFRCT2dZMlVQcW5lK0JUUEErQmoxVUM1WVBJTDV2T2hORWVCRTAyTDdPZ3F2WUh6TjZ6bHR1Vkg1aUduU0N5a01OUHZSYTBaZz09
+
+### Query 2fa
+POST http://{{hostname}}:{{port}}/identity/manage/2fa
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+}
+
+### Enable 2fa
+POST http://{{hostname}}:{{port}}/identity/manage/2fa
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "Enable": true,
+  "TwoFactorCode": "45375"
+}
+
+### Login with 2fa
+POST http://{{hostname}}:{{port}}/identity/login
+Content-Type: application/json
+
+{
+  "Email": "example@example.com",
+  "Password": "[PLACEHOLDER]-1a",
+  "TwoFactorCode": "883410"
+}
+
+### Login with recovery code
+POST http://{{hostname}}:{{port}}/identity/login
+Content-Type: application/json
+
+{
+  "Email": "example@example.com",
+  "Password": "[PLACEHOLDER]-1a",
+  "TwoFactorRecoveryCode": "57VG9-5FPQ2"
+}
+
+### Login (Cookie)
+POST http://{{hostname}}:{{port}}/identity/login?useCookies=true
+Content-Type: application/json
+
+{
+  "Email": "example@example.com",
+  "Password": "[PLACEHOLDER]-1a"
+}
+
+### Logout (Cookie)
+GET http://{{hostname}}:{{port}}/identity/logout

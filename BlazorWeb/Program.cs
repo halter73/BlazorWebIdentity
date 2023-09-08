@@ -27,12 +27,11 @@ builder.Services.ConfigureApplicationCookie(cookieOptions =>
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
-builder.Services.AddSingleton<IEmailSender, NoOpEmailSender>();
+builder.Services.AddSingleton<IEmailSender, MyEmailSender>();
 
-builder.Services.AddIdentityCore<BlazorWebUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentityCore<BlazorWebUser>()
     .AddEntityFrameworkStores<BlazorWebContext>()
-    .AddSignInManager()
-    .AddDefaultTokenProviders();
+    .AddApiEndpoints();
 
 builder.Services.AddRazorComponents()
     .AddServerComponents()
@@ -66,4 +65,11 @@ using (var scope = app.Services.CreateScope())
     scope.ServiceProvider.GetRequiredService<BlazorWebContext>().Database.EnsureCreated();
 }
 
+app.MapGroup("/identity").MyMapIdentityApi<BlazorWebUser>();
+
 app.Run();
+
+public class MyEmailSender : IEmailSender
+{
+    public Task SendEmailAsync(string email, string subject, string htmlMessage) => Task.CompletedTask;
+}
