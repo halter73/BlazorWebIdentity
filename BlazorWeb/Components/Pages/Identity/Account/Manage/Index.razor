@@ -1,7 +1,99 @@
 ﻿@page "/Identity/Account/Manage"
 
+@using System.ComponentModel.DataAnnotations;
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity;
+@using BlazorWeb.Identity.Data;
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<BlazorWebUser> UserManager
+@inject SignInManager<BlazorWebUser> SignInManager
+@inject NavigationManager NavigationManager
+
 <PageTitle>Profile</PageTitle>
 
 <h3>Profile</h3>
+<StatusMessage Message="@_message" />
 
-@* TODO: Implement this *@
+<div class="row">
+    <div class="col-md-6">
+        <EditForm id="profile-form" Model="Input" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="form-floating mb-3">
+                <input id="username" type="text" value="@_username" class="form-control" placeholder="Please choose your username." disabled />
+                <label for="username">Username</label>
+            </div>
+            <div class="form-floating mb-3">
+                <InputText id="phone-number" @bind-Value="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number." />
+                <label for="phone-number">Phone number</label>
+                <ValidationMessage For="() => Input.PhoneNumber" class="text-danger" />
+            </div>
+            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private string? _message;
+    private BlazorWebUser? _user;
+    private string? _username;
+    private string? _phoneNumber;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask is not { } authenticationStateTask)
+        {
+            // Shouldn't happen, but we should redirect to the log in page if it does
+            NavigationManager.NavigateTo("/Identity/Account/Login");
+            return;
+        }
+
+        var authenticationState = await authenticationStateTask;
+        _user = await UserManager.GetUserAsync(authenticationState.User);
+        if (_user is null)
+        {
+            _message = $"Unable to load user with ID '{UserManager.GetUserId(authenticationState.User)}'.";
+            return;
+        }
+
+        _username = await UserManager.GetUserNameAsync(_user);
+        _phoneNumber = await UserManager.GetPhoneNumberAsync(_user);
+
+        Input.PhoneNumber ??= _phoneNumber;
+    }
+
+    private async Task OnValidSubmitAsync()
+    {
+        if (_user is null)
+        {
+            return;
+        }
+
+        if (Input.PhoneNumber != _phoneNumber)
+        {
+            var setPhoneResult = await UserManager.SetPhoneNumberAsync(_user, Input.PhoneNumber);
+            if (!setPhoneResult.Succeeded)
+            {
+                _message = "Unexpected error when trying to set phone number.";
+                return;
+            }
+        }
+
+        await SignInManager.RefreshSignInAsync(_user);
+        _message = "Your profile has been updated";
+    }
+
+    private sealed class InputModel
+    {
+        [Phone]
+        [Display(Name = "Phone number")]
+        public string? PhoneNumber { get; set; }
+    }
+}
