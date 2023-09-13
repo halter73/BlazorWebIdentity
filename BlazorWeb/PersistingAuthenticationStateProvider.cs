@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using BlazorWeb.Client;
+﻿using BlazorWeb.Client;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -7,12 +6,12 @@ using Microsoft.Extensions.Options;
 
 namespace BlazorWeb;
 
-public class ServerAuthenticationStateProvider : AuthenticationStateProvider, IDisposable
+public class PersistingAuthenticationStateProvider : AuthenticationStateProvider, IDisposable
 {
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly PersistingComponentStateSubscription _subscription;
 
-    public ServerAuthenticationStateProvider(IHttpContextAccessor contextAccessor, PersistentComponentState state, IOptions<IdentityOptions> identityOptions)
+    public PersistingAuthenticationStateProvider(IHttpContextAccessor contextAccessor, PersistentComponentState state, IOptions<IdentityOptions> identityOptions)
     {
         _contextAccessor = contextAccessor;
 
@@ -33,13 +32,10 @@ public class ServerAuthenticationStateProvider : AuthenticationStateProvider, ID
     }
 
     private HttpContext RequiredHttpContext => 
-        _contextAccessor.HttpContext ??
-        throw new InvalidOperationException("IHttpContextAccessor HttpContext AsyncLocal missing!"); 
+        _contextAccessor.HttpContext ?? throw new InvalidOperationException("IHttpContextAccessor HttpContext AsyncLocal missing!"); 
 
-    public override Task<AuthenticationState> GetAuthenticationStateAsync()
-    {
-        return Task.FromResult(new AuthenticationState(RequiredHttpContext.User));
-    }
+    public override Task<AuthenticationState> GetAuthenticationStateAsync() =>
+        Task.FromResult(new AuthenticationState(RequiredHttpContext.User));
 
     public void Dispose()
     {

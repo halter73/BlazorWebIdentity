@@ -1,10 +1,8 @@
-using System.Reflection;
 using BlazorWeb;
 using BlazorWeb.Components;
 using BlazorWeb.Identity.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,8 +24,7 @@ builder.Services.ConfigureApplicationCookie(cookieOptions =>
 });
 
 builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
-builder.Services.AddSingleton<IEmailSender, NoOpEmailSender>();
+builder.Services.AddScoped<AuthenticationStateProvider, PersistingAuthenticationStateProvider>();
 
 builder.Services.AddIdentityCore<BlazorWebUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<BlazorWebContext>()
@@ -59,7 +56,7 @@ app.UseStaticFiles();
 app.MapRazorComponents<App>()
     .AddServerRenderMode()
     .AddWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(Assembly.Load("BlazorWeb.Client"));
+    .AddAdditionalAssemblies(typeof(BlazorWeb.Client._Imports).Assembly);
 
 using (var scope = app.Services.CreateScope())
 {
