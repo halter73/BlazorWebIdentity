@@ -22,11 +22,11 @@
             <ValidationSummary class="text-danger" role="alert" />
             <div class="form-floating mb-3">
                 <input id="username" type="text" value="@_username" class="form-control" placeholder="Please choose your username." disabled />
-                <label for="username">Username</label>
+                <label for="username" class="form-label">Username</label>
             </div>
             <div class="form-floating mb-3">
                 <InputText id="phone-number" @bind-Value="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number." />
-                <label for="phone-number">Phone number</label>
+                <label for="phone-number" class="form-label">Phone number</label>
                 <ValidationMessage For="() => Input.PhoneNumber" class="text-danger" />
             </div>
             <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
@@ -41,25 +41,18 @@
     private string? _phoneNumber;
 
     [SupplyParameterFromForm]
-    private InputModel Input { get; set; } = new();
+    private InputModel Input { get; set; } = default!;
 
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        if (AuthenticationStateTask is not { } authenticationStateTask)
-        {
-            // Shouldn't happen, but we should redirect to the log in page if it does
-            NavigationManager.NavigateTo("/Identity/Account/Login");
-            return;
-        }
+        Input ??= new();
 
-        var authenticationState = await authenticationStateTask;
-        _user = await UserManager.GetUserAsync(authenticationState.User);
+        (_user, _message) = await UserManager.GetUserAsync(AuthenticationStateTask);
         if (_user is null)
         {
-            _message = $"Unable to load user with ID '{UserManager.GetUserId(authenticationState.User)}'.";
             return;
         }
 
