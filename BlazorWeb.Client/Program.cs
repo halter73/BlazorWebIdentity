@@ -6,6 +6,6 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddSingleton<AuthenticationStateProvider, ClientAuthenticationStateProvider>();
+builder.Services.AddSingleton<AuthenticationStateProvider, PersistedAuthenticationStateProvider>();
 
 await builder.Build().RunAsync();

@@ -3,6 +3,7 @@ using BlazorWeb.Components;
 using BlazorWeb.Identity.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,10 @@ sqlConnection.Open();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddRazorComponents()
+    .AddServerComponents()
+    .AddWebAssemblyComponents();
+
 builder.Services.AddDbContext<BlazorWebContext>(options => options.UseSqlite(sqlConnection));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -31,9 +36,7 @@ builder.Services.AddIdentityCore<BlazorWebUser>(options => options.SignIn.Requir
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-builder.Services.AddRazorComponents()
-    .AddServerComponents()
-    .AddWebAssemblyComponents();
+builder.Services.AddSingleton<IEmailSender, NoOpEmailSender>();
 
 var app = builder.Build();
 

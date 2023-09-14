@@ -15,18 +15,25 @@ public class PersistingAuthenticationStateProvider : AuthenticationStateProvider
     {
         _contextAccessor = contextAccessor;
 
-        var userIdKey = identityOptions.Value.ClaimsIdentity.UserIdClaimType;
-        var emailKey = identityOptions.Value.ClaimsIdentity.EmailClaimType;
-
         _subscription = state.RegisterOnPersisting(() =>
         {
             var user = RequiredHttpContext.User;
 
-            state.PersistAsJson(ClientAuthenticationStateProvider.PersistenceKey, new UserInfo
+            if (user.Identity?.IsAuthenticated == true)
             {
-                UserId = user.FindFirst(userIdKey)?.Value,
-                Email = user.FindFirst(emailKey)?.Value,
-            });
+                var userId = user.FindFirst(identityOptions.Value.ClaimsIdentity.UserIdClaimType)?.Value;
+                var email = user.FindFirst(identityOptions.Value.ClaimsIdentity.EmailClaimType)?.Value;
+
+                if (userId != null && email != null)
+                {
+                    state.PersistAsJson(nameof(UserInfo), new UserInfo
+                    {
+                        UserId = userId,
+                        Email = email,
+                    });
+                }
+            }
+
             return Task.CompletedTask;
         });
     }
