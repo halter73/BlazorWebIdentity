@@ -100,11 +100,12 @@
                 Input.NewEmail!,
                 "Confirm your email",
                 $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-            _message = "Confirmation link to change email sent. Please check your email.";
+
+            NavigationManager.ReloadWithMessage("Confirmation link to change email sent. Please check your email.");
             return;
         }
 
-        _message = "Your email is unchanged.";
+        NavigationManager.ReloadWithMessage("Your email is unchanged.");
     }
 
     private async Task OnSendEmailVerificationAsync()
@@ -125,7 +126,7 @@
             "Confirm your email",
             $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-        _message = "Verification email sent. Please check your email.";
+        NavigationManager.ReloadWithMessage("Verification email sent. Please check your email.");
     }
 
     private sealed class InputModel
