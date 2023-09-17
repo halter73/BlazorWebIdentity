@@ -77,14 +77,18 @@
 
         if (RemoteError is not null)
         {
-            NavigationManager.NavigateToWithMessage("Identity/Account/Login", "Error from external provider: " + RemoteError);
+            NavigationManager.RedirectTo(
+                "Identity/Account/Login",
+                new() { ["Message"] = "Error from external provider: " + RemoteError });
             return;
         }
 
         var externalLoginInfo = await SignInManager.GetExternalLoginInfoAsync();
         if (externalLoginInfo is null)
         {
-            NavigationManager.NavigateToWithMessage("Identity/Account/Login", "Error loading external login information.");
+            NavigationManager.RedirectTo(
+                "Identity/Account/Login",
+                new() { ["Message"] = "Error loading external login information." });
             return;
         }
 
@@ -101,7 +105,7 @@
 
             // We should only reach this page via the login callback, so redirect back to
             // the login page if we get here some other way.
-            NavigationManager.NavigateTo("Identity/Account/Login");
+            NavigationManager.RedirectTo("Identity/Account/Login");
             return;
         }
     }
@@ -120,13 +124,13 @@
                 "{Name} logged in with {LoginProvider} provider.",
                 _externalLoginInfo.Principal.Identity?.Name,
                 _externalLoginInfo.LoginProvider);
-            NavigationManager.NavigateTo(ReturnUrl);
+            NavigationManager.RedirectTo(ReturnUrl);
             return;
         }
 
         if (result.IsLockedOut)
         {
-            NavigationManager.NavigateTo("/Identity/Account/Lockout");
+            NavigationManager.RedirectTo("/Identity/Account/Lockout");
             return;
         }
 
@@ -165,15 +169,12 @@
                 // If account confirmation is required, we need to show the link if we don't have a real email sender
                 if (UserManager.Options.SignIn.RequireConfirmedAccount)
                 {
-                    var confirmationUrl = NavigationManager.GetUriWithQueryParameters(
-                        $"{NavigationManager.BaseUri}Identity/Account/RegisterConfirmation",
-                        new Dictionary<string, object?> { ["Email"] = Input.Email });
-                    NavigationManager.NavigateTo(confirmationUrl);
+                    NavigationManager.RedirectTo("/Identity/Account/RegisterConfirmation", new() { ["Email"] = Input.Email });
                     return;
                 }
 
                 await SignInManager.SignInAsync(user, isPersistent: false, _externalLoginInfo.LoginProvider);
-                NavigationManager.NavigateTo(ReturnUrl);
+                NavigationManager.RedirectTo(ReturnUrl);
                 return;
             }
         }

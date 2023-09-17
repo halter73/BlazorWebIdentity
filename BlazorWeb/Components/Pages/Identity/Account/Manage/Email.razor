@@ -101,11 +101,11 @@
                 "Confirm your email",
                 $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-            NavigationManager.ReloadWithMessage("Confirmation link to change email sent. Please check your email.");
+            NavigationManager.RedirectToCurrentPage(new() { ["Message"] = "Confirmation link to change email sent. Please check your email." });
             return;
         }
 
-        NavigationManager.ReloadWithMessage("Your email is unchanged.");
+        NavigationManager.RedirectToCurrentPage(new() { ["Message"] = "Your email is unchanged." });
     }
 
     private async Task OnSendEmailVerificationAsync()
@@ -126,7 +126,7 @@
             "Confirm your email",
             $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-        NavigationManager.ReloadWithMessage("Verification email sent. Please check your email.");
+        NavigationManager.RedirectToCurrentPage(new() { ["Message"] = "Verification email sent. Please check your email." });
     }
 
     private sealed class InputModel

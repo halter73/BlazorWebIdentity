@@ -136,12 +136,12 @@
         var result = await UserManager.RemoveLoginAsync(_user, RemoveLoginLoginProvider!, RemoveLoginProviderKey!);
         if (!result.Succeeded)
         {
-            NavigationManager.ReloadWithMessage("The external login was not removed.");
+            NavigationManager.RedirectToCurrentPage(new() { ["Message"] = "The external login was not removed." });
             return;
         }
 
         await SignInManager.RefreshSignInAsync(_user);
-        NavigationManager.ReloadWithMessage("The external login was removed.");
+        NavigationManager.RedirectToCurrentPage(new() { ["Message"] = "The external login was removed." });
     }
 
     private async Task OnSubmitLinkLoginAsync()
@@ -171,20 +171,20 @@
         var info = await SignInManager.GetExternalLoginInfoAsync(userId);
         if (info == null)
         {
-            NavigationManager.ReloadWithMessage($"Unexpected error occurred loading external login info.");
+            NavigationManager.RedirectToCurrentPage(new() { ["Message"] = "Unexpected error occurred loading external login info." });
             return;
         }
 
         var result = await UserManager.AddLoginAsync(_user, info);
         if (!result.Succeeded)
         {
-            NavigationManager.ReloadWithMessage("The external login was not added. External logins can only be associated with one account.");
+            NavigationManager.RedirectToCurrentPage(new() { ["Message"] = "The external login was not added. External logins can only be associated with one account." });
             return;
         }
 
         // Clear the existing external cookie to ensure a clean login process
         await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-        NavigationManager.ReloadWithMessage("The external login was added.");
+        NavigationManager.RedirectToCurrentPage(new() { ["Message"] = "The external login was added." });
     }
 }

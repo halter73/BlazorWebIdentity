@@ -134,14 +134,14 @@
 
             if (UserManager.Options.SignIn.RequireConfirmedAccount)
             {
-                NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(
-                    NavigationManager.ToAbsoluteUri("Identity/Account/RegisterConfirmation").AbsoluteUri,
-                    new Dictionary<string, object?> { { "email", Input.Email }, { "returnUrl", ReturnUrl } }));
+                NavigationManager.RedirectTo(
+                    "Identity/Account/RegisterConfirmation",
+                    new() { ["Email"] = Input.Email, ["ReturnUrl"] = ReturnUrl });
             }
             else
             {
                 await SignInManager.SignInAsync(user, isPersistent: false);
-                NavigationManager.NavigateTo(NavigationManager.ToAbsoluteUri(NavigationManager.ToBaseRelativePath(ReturnUrl)).AbsoluteUri);
+                NavigationManager.RedirectTo(ReturnUrl);
             }
         }
         else

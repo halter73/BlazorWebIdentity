@@ -1,33 +1,38 @@
-﻿namespace Microsoft.AspNetCore.Components;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Microsoft.AspNetCore.Components;
 
 internal static class NavigationManagerExtensions
 {
-    public static void ReloadWithMessage(this NavigationManager navigationManager, string message)
-    {
-        var uri = GetUriWithMessageQueryParameter(navigationManager, newRelativeUri: null, message);
-        navigationManager.NavigateTo(uri, forceLoad: true);
-    }
+    // These extension methods help make more concise the common case of redirecting to the same or different page
+    // with a fresh set of query parameters. An exception is thrown if the current page is not being rendered from
+    // an endpoint, because it's not possible to redirect in that case.
 
-    public static void NavigateToWithMessage(this NavigationManager navigationManager, string? relativeUri, string? message)
+    [DoesNotReturn]
+    public static void RedirectTo(this NavigationManager navigationManager, string uri)
     {
-        var uri = GetUriWithMessageQueryParameter(navigationManager, relativeUri, message);
+        // This works because either:
+        // [1] NavigateTo() throws NavigationException, which is handled by the framework as a redirect.
+        // [2] NavigateTo() throws some other exception, which gets treated as a normal unhandled exception.
+        // [3] NavigateTo() does not throw an exception, meaning we're not rendering from an endpoint, so we throw
+        //     an InvalidOperationException to indicate that we can't redirect.
         navigationManager.NavigateTo(uri);
+        throw new InvalidOperationException($"Can only redirect when rendering from an endpoint.");
     }
 
-    private static string GetUriWithMessageQueryParameter(NavigationManager navigationManager, string? newRelativeUri, string? message)
+    [DoesNotReturn]
+    public static void RedirectTo(this NavigationManager navigationManager, string uri, Dictionary<string, object?> queryParameters)
     {
-        var uriBuilder = new UriBuilder(navigationManager.Uri);
-
-        if (newRelativeUri is not null)
-        {
-            uriBuilder.Path = newRelativeUri;
-        }
-
-        if (message is not null)
-        {
-            uriBuilder.Query = $"Message={message}";
-        }
-
-        return uriBuilder.ToString();
+        var uriWithoutQuery = navigationManager.ToAbsoluteUri(uri).GetLeftPart(UriPartial.Path);
+        var newUri = navigationManager.GetUriWithQueryParameters(uriWithoutQuery, queryParameters);
+        navigationManager.RedirectTo(newUri);
     }
+
+    [DoesNotReturn]
+    public static void RedirectToCurrentPage(this NavigationManager navigationManager)
+        => navigationManager.RedirectTo(navigationManager.Uri);
+
+    [DoesNotReturn]
+    public static void RedirectToCurrentPage(this NavigationManager navigationManager, Dictionary<string, object?> queryParameters)
+        => navigationManager.RedirectTo(navigationManager.Uri, queryParameters);
 }
