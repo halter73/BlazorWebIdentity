@@ -116,7 +116,7 @@
             var recoveryCodes = await UserManager.GenerateNewTwoFactorRecoveryCodesAsync(_user, 10);
             NavigationManager.RedirectTo(
                 "/Identity/Account/Manage/ShowRecoveryCodes",
-                new() { ["Message"] = message, ["RecoveryCodes"] = recoveryCodes.ToArray() });
+                new() { ["Message"] = message, ["RecoveryCodes"] = recoveryCodes?.ToArray() });
         }
         else
         {

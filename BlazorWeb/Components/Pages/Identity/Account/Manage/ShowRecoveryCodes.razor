@@ -4,7 +4,7 @@
 
 <PageTitle>Recovery codes</PageTitle>
 
-<StatusMessage Message="@_message" />
+<StatusMessage />
 <h3>Recovery codes</h3>
 <div class="alert alert-warning" role="alert">
     <p>
@@ -30,8 +30,6 @@
 </div>
 
 @code {
-    private string? _message;
-
     [SupplyParameterFromQuery]
     public string[] RecoveryCodes { get; set; } = default!;
 
