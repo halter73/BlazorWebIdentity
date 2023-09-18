@@ -4,12 +4,13 @@
 @using BlazorWeb.Identity.Data
 
 @inject UserManager<BlazorWebUser> UserManager
+@inject UserAccessor UserAccessor
 @inject NavigationManager NavigationManager
 @inject ILogger<GenerateRecoveryCodes> Logger
 
 <PageTitle>Generate two-factor authentication (2FA) recovery codes</PageTitle>
 
-<StatusMessage Message="@_message" />
+<StatusMessage />
 <h3>Generate two-factor authentication (2FA) recovery codes</h3>
 <div class="alert alert-warning" role="alert">
     <p>
@@ -32,19 +33,11 @@
 </div>
 
 @code {
-    private string? _message;
-    private BlazorWebUser? _user;
-
-    [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+    private BlazorWebUser _user = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        (_user, _message) = await UserManager.GetUserAsync(AuthenticationStateTask);
-        if (_user is null)
-        {
-            return;
-        }
+        _user = await UserAccessor.GetRequiredUserAsync();
 
         var isTwoFactorEnabled = await UserManager.GetTwoFactorEnabledAsync(_user);
         if (!isTwoFactorEnabled)
@@ -55,11 +48,6 @@
 
     private async Task OnSubmitAsync()
     {
-        if (_user is null)
-        {
-            return;
-        }
-
         var userId = await UserManager.GetUserIdAsync(_user);
         var recoveryCodes = await UserManager.GenerateNewTwoFactorRecoveryCodesAsync(_user, 10);
         var message = "You have generated new recovery codes.";

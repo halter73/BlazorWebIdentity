@@ -5,12 +5,13 @@
 
 @inject UserManager<BlazorWebUser> UserManager
 @inject SignInManager<BlazorWebUser> SignInManager
+@inject UserAccessor UserAccessor
 @inject NavigationManager NavigationManager
 @inject ILogger<ResetAuthenticator> Logger
 
 <PageTitle>Reset authenticator key</PageTitle>
 
-<StatusMessage Message="@_message" />
+<StatusMessage />
 <h3>Reset authenticator key</h3>
 <div class="alert alert-warning" role="alert">
     <p>
@@ -30,24 +31,15 @@
 </div>
 
 @code {
-    private string? _message;
-    private BlazorWebUser? _user;
-
-    [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+    private BlazorWebUser _user = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        (_user, _message) = await UserManager.GetUserAsync(AuthenticationStateTask);
+        _user = await UserAccessor.GetRequiredUserAsync();
     }
 
     private async Task OnSubmitAsync()
     {
-        if (_user is null)
-        {
-            return;
-        }
-
         await UserManager.SetTwoFactorEnabledAsync(_user, false);
         await UserManager.ResetAuthenticatorKeyAsync(_user);
         var userId = await UserManager.GetUserIdAsync(_user);

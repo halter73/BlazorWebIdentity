@@ -8,13 +8,14 @@
 @using BlazorWeb.Identity.Data
 
 @inject UserManager<BlazorWebUser> UserManager
+@inject UserAccessor UserAccessor
 @inject UrlEncoder UrlEncoder
 @inject NavigationManager NavigationManager
 @inject ILogger<EnableAuthenticator> Logger
 
 <PageTitle>Configure authenticator app</PageTitle>
 
-<StatusMessage Message="@_message" />
+<StatusMessage />
 <h3>Configure authenticator app</h3>
 <div>
     <p>To use an authenticator app go through the following steps:</p>
@@ -61,13 +62,9 @@
 @code {
     private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
-    private string? _message;
-    private BlazorWebUser? _user;
+    private BlazorWebUser _user = default!;
     private string? _sharedKey;
     private string? _authenticatorUri;
-
-    [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
 
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = default!;
@@ -76,22 +73,13 @@
     {
         Input ??= new();
 
-        (_user, _message) = await UserManager.GetUserAsync(AuthenticationStateTask);
-        if (_user is null)
-        {
-            return;
-        }
+        _user = await UserAccessor.GetRequiredUserAsync();
 
         await LoadSharedKeyAndQrCodeUriAsync(_user);
     }
 
     private async Task OnValidSubmitAsync()
     {
-        if (_user is null)
-        {
-            return;
-        }
-
         // Strip spaces and hyphens
         var verificationCode = Input.Code!.Replace(" ", string.Empty).Replace("-", string.Empty);
 

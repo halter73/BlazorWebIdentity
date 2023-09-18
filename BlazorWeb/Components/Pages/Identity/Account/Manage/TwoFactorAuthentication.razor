@@ -6,11 +6,12 @@
 
 @inject UserManager<BlazorWebUser> UserManager
 @inject SignInManager<BlazorWebUser> SignInManager
+@inject UserAccessor UserAccessor
 @inject NavigationManager NavigationManager
 
 <PageTitle>Two-factor authentication (2FA)</PageTitle>
 
-<StatusMessage Message="@_message" />
+<StatusMessage />
 <h3>Two-factor authentication (2FA)</h3>
 @if (_consentFeature?.CanTrack ?? true)
 {
@@ -69,7 +70,6 @@ else
 }
 
 @code {
-    private string? _message;
     private BlazorWebUser? _user;
     private ITrackingConsentFeature? _consentFeature;
     private bool _hasAuthenticator;
@@ -80,17 +80,9 @@ else
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
 
-    [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
-        (_user, _message) = await UserManager.GetUserAsync(AuthenticationStateTask);
-        if (_user is null)
-        {
-            return;
-        }
-
+        _user = await UserAccessor.GetRequiredUserAsync();
         _consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
         _hasAuthenticator = await UserManager.GetAuthenticatorKeyAsync(_user) is not null;
         _is2faEnabled = await UserManager.GetTwoFactorEnabledAsync(_user);
@@ -100,11 +92,6 @@ else
 
     private async Task OnSubmitForgetBrowserAsync()
     {
-        if (_user is null)
-        {
-            return;
-        }
-
         await SignInManager.ForgetTwoFactorClientAsync();
 
         NavigationManager.RedirectToCurrentPage(new()

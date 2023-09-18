@@ -17,9 +17,10 @@
 }
 else
 {
-    <form id="external-account" method="post" class="form-horizontal" @formname="external-login" @onsubmit="OnSubmitExternalLoginAsync">
-        <AntiforgeryToken />
+    <form id="external-account" class="form-horizontal" action="/Identity/Account/PerformExternalLogin" method="post">
         <div>
+            <AntiforgeryToken />
+            <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
             <p>
                 @foreach (var provider in _externalLogins!)
                 {
@@ -39,21 +40,10 @@ else
     [SupplyParameterFromQuery]
     private string ReturnUrl { get; set; } = default!;
 
-    [SupplyParameterFromForm]
-    private string? Provider { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
         ReturnUrl ??= "/";
 
         _externalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-    }
-
-    private async Task OnSubmitExternalLoginAsync()
-    {
-        var redirectUrl = NavigationManager.GetUriWithQueryParameters("/Identity/Account/ExternalLogin",
-            new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl, ["Action"] = ExternalLogin.LoginCallbackAction });
-        var properties = SignInManager.ConfigureExternalAuthenticationProperties(Provider!, redirectUrl);
-        await HttpContext.ChallengeAsync(Provider!, properties);
     }
 }

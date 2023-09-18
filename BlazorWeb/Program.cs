@@ -56,6 +56,8 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
+app.MapIdentityUI();
+
 app.MapRazorComponents<App>()
     .AddServerRenderMode()
     .AddWebAssemblyRenderMode()
