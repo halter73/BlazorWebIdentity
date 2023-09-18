@@ -13,7 +13,6 @@ public class ClientAuthenticationStateProvider(PersistentComponentState persiste
 
     public override Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        // REVIEW: Is TryTakeFromJson correctly annotated? The "?" in "userInfo?.Email" should not be necessary.
         if (!persistentState.TryTakeFromJson<UserInfo>(PersistenceKey, out var userInfo)
             || userInfo?.Email is null || userInfo.UserId is null)
         {
@@ -26,11 +25,7 @@ public class ClientAuthenticationStateProvider(PersistentComponentState persiste
             new Claim(ClaimTypes.Email, userInfo.Email) ];
 
         return Task.FromResult(
-            new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims))));
-
-        //return Task.FromResult(
-        //    new AuthenticationState(new ClaimsPrincipal(
-        //        new ClaimsIdentity(claims, "Identity.Application", userInfo.Email))));
+            new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, "Identity.Application"))));
     }
 }
 
