@@ -9,7 +9,7 @@ using Microsoft.Extensions.Primitives;
 using BlazorWeb.Components.Pages.Identity.Account.Manage;
 using Microsoft.AspNetCore.Authentication;
 
-namespace BlazorWeb.Identity;
+namespace Microsoft.AspNetCore.Routing;
 
 internal static class IdentityUIEndpointRouteBuilderExtensions
 {
@@ -93,6 +93,24 @@ internal static class IdentityUIEndpointRouteBuilderExtensions
                 
             var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, UserManager.GetUserId(context.User));
             return Results.Challenge(properties, [provider]);
+        });
+
+        routeGroup.MapPost("/Account/Logout", async (
+            [FromServices] SignInManager<BlazorWebUser> signInManager,
+            [FromForm] string returnUrl) =>
+        {
+            await signInManager.SignOutAsync();
+            logger.LogInformation("User logged out.");
+            if (returnUrl is not null)
+            {
+                return Results.LocalRedirect(returnUrl);
+            }
+            else
+            {
+                // This needs to be a redirect so that the browser performs a new
+                // request and the identity for the user gets updated.
+                return Results.LocalRedirect("/");
+            }
         });
 
         return routeGroup;
