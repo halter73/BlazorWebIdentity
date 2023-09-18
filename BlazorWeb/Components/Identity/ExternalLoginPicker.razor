@@ -34,9 +34,6 @@ else
 @code {
     private IList<AuthenticationScheme>? _externalLogins;
 
-    [CascadingParameter]
-    public HttpContext HttpContext { get; set; } = default!;
-
     [SupplyParameterFromQuery]
     private string ReturnUrl { get; set; } = default!;
 
