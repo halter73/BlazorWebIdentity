@@ -1,6 +1,7 @@
 using System.Reflection;
 using BlazorWeb;
 using BlazorWeb.Components;
+using BlazorWeb.Identity;
 using BlazorWeb.Identity.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -27,6 +28,7 @@ builder.Services.ConfigureApplicationCookie(cookieOptions =>
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
+builder.Services.AddScoped<UserAccessor>();
 builder.Services.AddSingleton<IEmailSender, NoOpEmailSender>();
 
 builder.Services.AddIdentityCore<BlazorWebUser>(options => options.SignIn.RequireConfirmedAccount = true)
