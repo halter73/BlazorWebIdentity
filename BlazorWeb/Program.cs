@@ -27,6 +27,7 @@ builder.Services.ConfigureApplicationCookie(cookieOptions =>
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
+builder.Services.AddScoped<UserAccessor>();
 builder.Services.AddSingleton<IEmailSender, NoOpEmailSender>();
 
 builder.Services.AddIdentityCore<BlazorWebUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -55,6 +56,8 @@ else
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+app.MapIdentityUI();
 
 app.MapRazorComponents<App>()
     .AddServerRenderMode()

@@ -1,7 +1,7 @@
-﻿using System.Security.Claims;
-using BlazorWeb.Client;
+﻿using BlazorWeb.Client;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
@@ -29,7 +29,7 @@ public class ServerAuthenticationStateProvider : AuthenticationStateProvider, ID
                 Email = user.FindFirst(emailKey)?.Value,
             });
             return Task.CompletedTask;
-        });
+        }, RenderMode.InteractiveAuto);
     }
 
     private HttpContext RequiredHttpContext => 
